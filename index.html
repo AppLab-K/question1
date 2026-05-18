@@ -45,6 +45,7 @@
     transition: background var(--transition), color var(--transition);
   }
 
+  /* プログレスバー */
   .progress-container {
     position: fixed;
     top: 0; left: 0; width: 100%;
@@ -86,24 +87,15 @@
   }
   .theme-toggle-btn:hover { border-color: var(--text-sub); transform: scale(1.05); }
   .theme-toggle-btn svg { width: 20px; height: 20px; fill: currentColor; }
+  
   .theme-toggle-btn .icon-sun { display: block; }
   .theme-toggle-btn .icon-moon { display: none; }
   [data-theme="light"] .theme-toggle-btn .icon-sun { display: none; }
   [data-theme="light"] .theme-toggle-btn .icon-moon { display: block; }
 
-  .container {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px 20px 80px;
-  }
+  .container { max-width: 600px; margin: 0 auto; padding: 20px 20px 80px; }
 
-  h1, h2 {
-    font-weight: 600;
-    letter-spacing: 0.05em;
-    margin-bottom: 30px;
-    color: var(--text-main);
-    text-align: center;
-  }
+  h1, h2 { font-weight: 600; letter-spacing: 0.05em; margin-bottom: 30px; text-align: center; }
   h1 { font-size: 1.5rem; }
   h2 { font-size: 1.25rem; }
 
@@ -131,12 +123,7 @@
     75% { transform: translateX(4px); }
   }
 
-  .q-label {
-    font-size: 0.95rem;
-    font-weight: 500;
-    color: var(--text-main);
-    margin-bottom: 16px;
-  }
+  .q-label { font-size: 0.95rem; font-weight: 500; margin-bottom: 16px; }
   .q-label span { color: var(--text-sub); font-size: 0.8em; margin-left: 8px; font-weight: normal; }
 
   .opts { display: flex; flex-wrap: wrap; gap: 10px; }
@@ -157,6 +144,7 @@
     text-align: center;
   }
   .opt:hover { border-color: var(--text-sub); color: var(--text-main); }
+  
   .opt.sel {
     background: rgba(99, 102, 241, 0.1);
     border-color: var(--accent);
@@ -201,26 +189,7 @@
   }
   .btn-sub:hover { background: var(--border); }
 
-  .admin-link {
-    text-align: center;
-    margin-top: 40px;
-  }
-  .admin-link a {
-    color: var(--text-sub);
-    text-decoration: underline;
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: var(--transition);
-  }
-  .admin-link a:hover { color: var(--text-main); }
-
-  .success-wrap {
-    text-align: center;
-    padding: 40px 20px;
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-  }
+  .success-wrap { text-align: center; padding: 40px 20px; background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-lg); }
   .success-icon { font-size: 3rem; color: var(--success); margin-bottom: 20px; }
   .success-wrap p { color: var(--text-sub); font-size: 0.95rem; margin-bottom: 30px; }
 
@@ -230,14 +199,13 @@
     padding: 12px 24px; border-radius: 30px; font-size: 0.9rem; font-weight: 500;
     box-shadow: 0 10px 25px rgba(0,0,0,0.3);
     opacity: 0; transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    pointer-events: none; z-index: 1000; white-space: normal; text-align: center; max-width: 90%;
+    pointer-events: none; z-index: 1000; text-align: center; max-width: 90%;
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
   .spinner {
     border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid #fff;
-    border-radius: 50%; width: 18px; height: 18px;
-    animation: spin 1s linear infinite; display: none;
+    border-radius: 50%; width: 18px; height: 18px; animation: spin 1s linear infinite; display: none;
   }
   @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
@@ -261,7 +229,6 @@
 </div>
 
 <div class="container">
-  <!-- アンケート画面 -->
   <div id="sv-survey" class="section active">
     <h1>ネプリーグアンケート</h1>
 
@@ -331,10 +298,6 @@
       <div class="spinner" id="submit-spinner"></div>
       <span id="submit-text">回答を送信する</span>
     </button>
-
-    <div class="admin-link">
-      <a href="admin.html">管理者モードへ</a>
-    </div>
   </div>
 
   <!-- 完了画面 -->
@@ -353,8 +316,7 @@
 <!-- Firebase SDK -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-  import { getFirestore, doc, setDoc, getDoc }
-    from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+  import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyApCa9WybT_XLI6VlKHFI1vtcaVKUbq-C4",
@@ -378,29 +340,30 @@
   }
 
   function getFriendlyErrorMessage(error) {
-    console.error("Firebase Error:", error);
+    console.error("Firebase Error Details:", error);
     const code = error && error.code ? error.code : "";
     const msg = error && error.message ? error.message : "";
-    if (code === 'resource-exhausted' || msg.includes('quota') || msg.includes('LIMIT_EXCEEDED'))
-      return '【お知らせ】本日の無料枠を超えたため一時停止しています。明日以降にお試しください。';
-    if (code === 'permission-denied')
-      return 'アクセス権限がありません。';
-    if (code === 'unavailable' || !navigator.onLine)
-      return 'インターネット接続が切断されているか不安定です。';
+
+    if (code === 'resource-exhausted' || msg.includes('quota') || msg.includes('LIMIT_EXCEEDED')) {
+      return '【お知らせ】本日の無料枠（アクセス上限）を超えたため、一時的に受付を停止しています。明日以降に再度お試しください。';
+    }
+    if (code === 'permission-denied') {
+      return 'アクセス権限がありません。セキュリティ設定を見直してください。';
+    }
+    if (code === 'unavailable' || !navigator.onLine) {
+      return 'インターネットへの接続が切断されているか、不安定です。通信環境の良い場所で再度お試しください。';
+    }
     return '通信エラーが発生しました。しばらく時間を置いてから再度お試しください。';
   }
 
-  window._firebase = { db, doc, setDoc, getDoc };
-  window._getUid = getUid;
-  window._getFriendlyError = getFriendlyErrorMessage;
+  window._firebase = { db, doc, setDoc, getDoc, getUid };
 
-  // 送信処理
   window.submitSurvey = async function() {
     const required = ['grade','role','q1','q2','q3','q4','q5'];
     let firstError = null;
-
+    
     document.querySelectorAll('.q-block').forEach(b => b.classList.remove('error-highlight'));
-
+    
     for (const k of required) {
       if (!window._ans[k]) {
         const block = document.getElementById(`block-${k}`);
@@ -418,21 +381,25 @@
     const btn = document.getElementById('submit-btn');
     const spinner = document.getElementById('submit-spinner');
     const text = document.getElementById('submit-text');
-
+    
     btn.disabled = true;
     spinner.style.display = 'block';
     text.textContent = '送信中...';
 
     try {
       const uid = getUid();
+      const { db, doc, setDoc } = window._firebase;
+      
       await setDoc(doc(db, 'answers', uid), {
         ...window._ans,
         timestamp: Date.now()
       });
+      
       showSection('sv-done');
       showToast('回答を送信しました！');
     } catch(e) {
-      showToast(getFriendlyErrorMessage(e));
+      const friendlyMsg = getFriendlyErrorMessage(e);
+      showToast(friendlyMsg);
     } finally {
       btn.disabled = false;
       spinner.style.display = 'none';
@@ -440,10 +407,10 @@
     }
   };
 
-  // 過去の回答復元
   async function restorePrev() {
     const uid = getUid();
     try {
+      const { db, doc, getDoc } = window._firebase;
       const docSnap = await getDoc(doc(db, 'answers', uid));
       if (!docSnap.exists()) return;
       const d = docSnap.data();
@@ -471,13 +438,13 @@
     const savedTheme = localStorage.getItem('theme') || 'dark';
     document.documentElement.setAttribute('data-theme', savedTheme);
   }
-
+  
   window.toggleTheme = function() {
-    const current = document.documentElement.getAttribute('data-theme');
-    const next = current === 'light' ? 'dark' : 'light';
-    document.documentElement.setAttribute('data-theme', next);
-    localStorage.setItem('theme', next);
-    showToast(next === 'light' ? 'ライトモードに切り替えました' : 'ダークモードに切り替えました');
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    showToast(newTheme === 'light' ? 'ライトモードに切り替えました' : 'ダークモードに切り替えました');
   };
 
   initTheme();
@@ -485,7 +452,9 @@
   function updateProgress() {
     const answered = Object.keys(window._ans).length;
     const progress = (answered / TOTAL_QUESTIONS) * 100;
-    document.getElementById('progress-bar').style.width = `${progress}%`;
+    const bar = document.getElementById('progress-bar');
+    bar.style.width = `${progress}%`;
+    
     const container = document.getElementById('progress-container');
     if (answered > 0 && progress < 100) {
       container.style.display = 'block';
@@ -509,9 +478,7 @@
   window.showSection = function(id) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
-    const answered = Object.keys(window._ans).length;
-    document.getElementById('progress-container').style.display =
-      (id === 'sv-survey' && answered > 0) ? 'block' : 'none';
+    document.getElementById('progress-container').style.display = (id === 'sv-survey' && Object.keys(window._ans).length > 0) ? 'block' : 'none';
   };
 
   let toastTimer;
@@ -523,6 +490,5 @@
     toastTimer = setTimeout(() => t.classList.remove('show'), 4000);
   };
 </script>
-
 </body>
 </html>
