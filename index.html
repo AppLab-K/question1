@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>教員アンケート</title>
+<title>教員アンケート1</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
 
@@ -415,24 +415,24 @@
 
 <div class="toast" id="toast"></div>
 
-<!-- Firebase SDK -->
+<!-- Firebase SDK (Firestore用へ移行) -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-  import { getDatabase, ref, set, get, remove, child }
-    from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+  import { getFirestore, doc, setDoc, getDoc, getDocs, collection, writeBatch } 
+    from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyApCa9WybT_XLI6VlKHFI1vtcaVKUbq-C4",
     authDomain: "question-2506a.firebaseapp.com",
-    databaseURL: "https://question-2506a-default-rtdb.firebaseio.com",
     projectId: "question-2506a",
     storageBucket: "question-2506a.firebasestorage.app",
     messagingSenderId: "937214412547",
     appId: "1:937214412547:web:8ceb379d3e938106420b36"
+    // ※ databaseURL は不要になったため削除
   };
 
   const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
+  const db = getFirestore(app);
 
   // 端末ごとのIDを生成（localStorageで管理）
   function getUid() {
@@ -445,7 +445,7 @@
   }
 
   // グローバルに公開（onclick から呼べるように）
-  window._firebase = { db, ref, set, get, remove, child, getUid };
+  window._firebase = { db, doc, setDoc, getDoc, getDocs, collection, writeBatch, getUid };
 
   // 回答送信
   window.submitSurvey = async function() {
@@ -461,11 +461,14 @@
 
     try {
       const uid = getUid();
-      const { db, ref, set } = window._firebase;
-      await set(ref(db, 'answers/' + uid), {
+      const { db, doc, setDoc } = window._firebase;
+      
+      // Firestoreの「answers」コレクション内の「uid」ドキュメントに保存
+      await setDoc(doc(db, 'answers', uid), {
         ...window._ans,
         timestamp: Date.now()
       });
+      
       showSection('sv-done');
       showToast('送信しました！');
     } catch(e) {
@@ -484,16 +487,20 @@
     document.getElementById('result-area').innerHTML = '';
 
     try {
-      const { db, ref, get } = window._firebase;
-      const snap = await get(ref(db, 'answers'));
-      if (!snap.exists()) {
+      const { db, collection, getDocs } = window._firebase;
+      
+      // answersコレクションから全ドキュメントを取得
+      const snap = await getDocs(collection(db, 'answers'));
+      if (snap.empty) {
         contentEl.innerHTML = '<div class="loading-msg">まだ回答がありません。</div>';
         window._adminData = [];
         return;
       }
 
-      const data = snap.val();
-      const entries = Object.values(data);
+      const entries = [];
+      snap.forEach(doc => {
+        entries.push(doc.data());
+      });
       window._adminData = entries;
 
       const qs = ['grade','role','q1','q2','q3','q4','q5'];
@@ -560,13 +567,24 @@
   window.clearAll = async function() {
     if (!confirm('全データを削除しますか？この操作は取り消せません。')) return;
     try {
-      const { db, ref, remove } = window._firebase;
-      await remove(ref(db, 'answers'));
+      const { db, collection, getDocs, writeBatch } = window._firebase;
+      
+      // Firestoreはコレクションの一発削除が無いため、一括処理（Batch）でドキュメントを全て削除
+      const snap = await getDocs(collection(db, 'answers'));
+      if (snap.empty) return;
+
+      const batch = writeBatch(db);
+      snap.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+      await batch.commit();
+
       await window.loadAdmin();
       document.getElementById('result-area').innerHTML = '';
       showToast('削除しました');
     } catch(e) {
       showToast('削除に失敗しました');
+      console.error(e);
     }
   };
 
@@ -574,10 +592,10 @@
   async function restorePrev() {
     const uid = getUid();
     try {
-      const { db, ref, get } = window._firebase;
-      const snap = await get(ref(db, 'answers/' + uid));
-      if (!snap.exists()) return;
-      const d = snap.val();
+      const { db, doc, getDoc } = window._firebase;
+      const docSnap = await getDoc(doc(db, 'answers', uid));
+      if (!docSnap.exists()) return;
+      const d = docSnap.data();
       Object.keys(d).forEach(k => {
         const g = document.querySelector(`.opts[data-key="${k}"]`);
         if (!g) return;
