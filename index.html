@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>アンケート 質問</title>
+<style>
+  /* 黒背景・白文字のデザイン設定 */
+  body { 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    margin: 0; 
+    padding: 20px; 
+    background-color: #000000; 
+    color: #ffffff; 
+  }
+  .container { 
+    max-width: 800px; 
+    margin: 0 auto; 
+    padding: 20px; 
+  }
+  h1, h2 { 
+    border-bottom: 1px solid #555; 
+    padding-bottom: 10px; 
+    font-weight: normal;
+  }
+  .form-group { margin-bottom: 30px; }
+  .form-group label.question { 
+    display: block; 
+    margin-bottom: 10px; 
+    font-size: 1.1em; 
+  }
+  .options { margin-top: 10px; }
+  .options label { 
+    margin-right: 15px; 
+    display: inline-block; 
+    margin-bottom: 8px; 
+    cursor: pointer; 
+  }
+  input[type="text"], input[type="password"] { 
+    width: 100%; 
+    padding: 10px; 
+    box-sizing: border-box; 
+    margin-top: 5px; 
+    background-color: #222; 
+    color: #fff; 
+    border: 1px solid #555; 
+    border-radius: 4px; 
+    font-size: 1em; 
+  }
+  button { 
+    padding: 12px 24px; 
+    background-color: #333; 
+    color: white; 
+    border: 1px solid #fff; 
+    border-radius: 4px; 
+    cursor: pointer; 
+    font-size: 1em; 
+    transition: background-color 0.3s; 
+  }
+  button:hover { background-color: #555; }
+  .btn-secondary { background-color: #444; border-color: #888; }
+  .btn-secondary:hover { background-color: #666; }
+  .hidden { display: none; }
+  
+  /* テーブル（一覧）のデザイン */
+  table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.9em; }
+  th, td { border: 1px solid #555; padding: 10px; text-align: left; }
+  th { background-color: #222; white-space: nowrap; }
+  
+  .admin-link { text-align: right; margin-top: 40px; border-top: 1px solid #333; padding-top: 15px; }
+  .admin-link a { color: #aaa; text-decoration: none; font-size: 0.9em; }
+  .admin-link a:hover { text-decoration: underline; color: #fff; }
+  
+  /* 集計結果のデザイン */
+  .result-box { margin-top: 25px; padding: 20px; background-color: #111; border: 1px solid #444; border-radius: 8px; }
+  .result-item { margin-bottom: 20px; background: #222; padding: 15px; border-radius: 4px; border-left: 4px solid #fff; }
+  .result-item h4 { margin: 0 0 10px 0; color: #fff; font-weight: normal; }
+  .result-item ul { margin: 0; padding-left: 20px; }
+  .result-item li { margin-bottom: 5px; }
+</style>
+</head>
+<body>
+
+<!-- アンケート回答画面 -->
+<div class="container" id="survey-section">
+  <h1>アンケート 質問</h1>
+  <form id="surveyForm">
+    <div class="form-group">
+      <label class="question" for="userName">お名前（※同じ名前で送信すると上書きされます）</label>
+      <input type="text" id="userName" placeholder="例：山田 太郎" required>
+    </div>
+
+    <div class="form-group">
+      <label class="question">担当学年（各学年団）</label>
+      <div class="options">
+        <label><input type="radio" name="grade" value="1年" required> 1年</label>
+        <label><input type="radio" name="grade" value="2年"> 2年</label>
+        <label><input type="radio" name="grade" value="3年"> 3年</label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="question">役職</label>
+      <div class="options">
+        <label><input type="radio" name="role" value="一般" required> 一般</label>
+        <label><input type="radio" name="role" value="学年主任"> 学年主任</label>
+        <label><input type="radio" name="role" value="副主任"> 副主任</label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="question">授業中に雑談をするかどうか（理科）</label>
+      <div class="options">
+        <label><input type="radio" name="q1" value="はい" required> はい</label>
+        <label><input type="radio" name="q1" value="いいえ"> いいえ</label>
+        <label><input type="radio" name="q1" value="分からない"> 分からない</label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="question">授業でほぼ毎回生徒を当てる（数学）</label>
+      <div class="options">
+        <label><input type="radio" name="q2" value="はい" required> はい</label>
+        <label><input type="radio" name="q2" value="いいえ"> いいえ</label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="question">結婚しているかどうか（全員）</label>
+      <div class="options">
+        <label><input type="radio" name="q3" value="結婚している" required> 結婚している</label>
+        <label><input type="radio" name="q3" value="恋人がいる"> 恋人がいる</label>
+        <label><input type="radio" name="q3" value="未婚かつ恋人がいない"> 未婚かつ恋人がいない</label>
+        <label><input type="radio" name="q3" value="秘密"> 秘密</label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="question">怒ったふりをしたことがあるか（学年主任・副主任）</label>
+      <div class="options">
+        <label><input type="radio" name="q4" value="はい" required> はい</label>
+        <label><input type="radio" name="q4" value="いいえ"> いいえ</label>
+        <label><input type="radio" name="q4" value="覚えてない分からない"> 覚えてない分からない</label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="question">正直課題を出すのがめんどくさいと思ったことがあるか（英語）</label>
+      <div class="options">
+        <label><input type="radio" name="q5" value="はい" required> はい</label>
+        <label><input type="radio" name="q5" value="いいえ"> いいえ</label>
+      </div>
+    </div>
+
+    <button type="submit">アンケートを送信する</button>
+  </form>
+  
+  <div class="admin-link">
+    <a href="#" onclick="showLogin()">管理者モードはこちら ＞</a>
+  </div>
+</div>
+
+<!-- 管理者ログイン画面 -->
+<div class="container hidden" id="login-section">
+  <h2>管理者ログイン</h2>
+  <div class="form-group">
+    <label for="adminPassword">パスワード</label>
+    <input type="password" id="adminPassword" placeholder="パスワードを入力">
+  </div>
+  <button onclick="login()">ログイン</button>
+  <button class="btn-secondary" onclick="showSurvey()">戻る</button>
+</div>
+
+<!-- 管理者画面（一覧・集計） -->
+<div class="container hidden" id="admin-section">
+  <h2>管理者モード - 回答一覧</h2>
+  <button class="btn-secondary" onclick="showSurvey()" style="margin-bottom: 15px;">アンケート画面に戻る</button>
+  
+  <div style="overflow-x: auto;">
+    <table id="answersTable">
+      <thead>
+        <tr>
+          <th>名前</th>
+          <th>学年</th>
+          <th>役職</th>
+          <th>Q1(理科)</th>
+          <th>Q2(数学)</th>
+          <th>Q3(結婚)</th>
+          <th>Q4(怒ったふり)</th>
+          <th>Q5(英語)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- データがここに挿入されます -->
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="margin-top: 40px; border-bottom: 1px solid #555; padding-bottom: 10px;">アンケート集計</h3>
+  <button onclick="calculateResults()">集計する</button>
+  
+  <div id="resultsArea" class="result-box hidden">
+    <!-- 集計結果がここに挿入されます -->
+  </div>
+</div>
+
+<script>
+  // ★★★ ここにGASでコピーした「ウェブアプリのURL」を貼り付けてください ★★★
+  const GAS_URL = 'ここにコピーしたURLを貼り付ける';
+
+  // アンケート送信時の処理
+  document.getElementById('surveyForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    if (GAS_URL === 'ここにコピーしたURLを貼り付ける') {
+      alert('エラー：GASのURLが設定されていません。HTMLファイルのコードを修正してください。');
+      return;
+    }
+
+    const name = document.getElementById('userName').value.trim();
+    if (!name) { alert('名前を入力してください。'); return; }
+
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.innerText = '送信中...';
+
+    const formData = new FormData(e.target);
+    const data = {
+      name: name,
+      grade: formData.get('grade'), role: formData.get('role'),
+      q1: formData.get('q1'), q2: formData.get('q2'), q3: formData.get('q3'),
+      q4: formData.get('q4'), q5: formData.get('q5')
+    };
+
+    // スプレッドシートへデータを送信
+    fetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+      alert('アンケートを送信しました。ご協力ありがとうございました！');
+      e.target.reset();
+    })
+    .catch(error => {
+      alert('送信に失敗しました。通信環境を確認するか、GASのURLが正しいか確認してください。');
+    })
+    .finally(() => {
+      submitBtn.disabled = false;
+      submitBtn.innerText = 'アンケートを送信する';
+    });
+  });
+
+  // 画面切り替え関数
+  function showLogin() {
+    document.getElementById('survey-section').classList.add('hidden');
+    document.getElementById('admin-section').classList.add('hidden');
+    document.getElementById('login-section').classList.remove('hidden');
+    document.getElementById('adminPassword').value = '';
+  }
+
+  function showSurvey() {
+    document.getElementById('login-section').classList.add('hidden');
+    document.getElementById('admin-section').classList.add('hidden');
+    document.getElementById('survey-section').classList.remove('hidden');
+  }
+
+  // ログイン処理
+  function login() {
+    const pass = document.getElementById('adminPassword').value;
+    if (pass === 'Sample1') {
+      document.getElementById('login-section').classList.add('hidden');
+      document.getElementById('admin-section').classList.remove('hidden');
+      document.getElementById('resultsArea').classList.add('hidden');
+      loadAdminData(); // サーバーからデータを取得して表示
+    } else {
+      alert('パスワードが間違っています。');
+    }
+  }
+
+  // サーバー（スプレッドシート）からデータを取得して一覧表示
+  let currentData = [];
+  function loadAdminData() {
+    const tbody = document.querySelector('#answersTable tbody');
+    tbody.innerHTML = '<tr><td colspan="8">データを読み込み中...</td></tr>';
+    
+    fetch(GAS_URL)
+      .then(response => response.json())
+      .then(data => {
+        currentData = data;
+        tbody.innerHTML = '';
+        if(data.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="8">まだ回答がありません。</td></tr>';
+          return;
+        }
+        data.forEach(row => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${escapeHTML(row.name)}</td><td>${escapeHTML(row.grade)}</td>
+            <td>${escapeHTML(row.role)}</td><td>${escapeHTML(row.q1)}</td>
+            <td>${escapeHTML(row.q2)}</td><td>${escapeHTML(row.q3)}</td>
+            <td>${escapeHTML(row.q4)}</td><td>${escapeHTML(row.q5)}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      })
+      .catch(error => {
+        tbody.innerHTML = '<tr><td colspan="8" style="color:#ff6b6b;">データの取得に失敗しました。</td></tr>';
+      });
+  }
+
+  // 集計処理
+  function calculateResults() {
+    const resultsArea = document.getElementById('resultsArea');
+    resultsArea.innerHTML = '';
+    resultsArea.classList.remove('hidden');
+
+    if (currentData.length === 0) {
+      resultsArea.innerHTML = '<p>データがありません。</p>';
+      return;
+    }
+
+    const counts = { grade: {}, role: {}, q1: {}, q2: {}, q3: {}, q4: {}, q5: {} };
+    let total = 0;
+
+    currentData.forEach(data => {
+      total++;
+      countItem(counts.grade, data.grade); countItem(counts.role, data.role);
+      countItem(counts.q1, data.q1); countItem(counts.q2, data.q2);
+      countItem(counts.q3, data.q3); countItem(counts.q4, data.q4);
+      countItem(counts.q5, data.q5);
+    });
+
+    let html = `<h3 style="margin-top:0;">総回答数: ${total} 名</h3>`;
+    html += generateResultHTML('担当学年', counts.grade);
+    html += generateResultHTML('役職', counts.role);
+    html += generateResultHTML('Q1: 授業中に雑談をするかどうか（理科）', counts.q1);
+    html += generateResultHTML('Q2: 授業でほぼ毎回生徒を当てる（数学）', counts.q2);
+    html += generateResultHTML('Q3: 結婚しているかどうか（全員）', counts.q3);
+    html += generateResultHTML('Q4: 怒ったふりをしたことがあるか（学年主任・副主任）', counts.q4);
+    html += generateResultHTML('Q5: 正直課題を出すのがめんどくさいと思ったことがあるか（英語）', counts.q5);
+
+    resultsArea.innerHTML = html;
+  }
+
+  function countItem(obj, val) {
+    if (!val) return;
+    obj[val] = (obj[val] || 0) + 1;
+  }
+
+  function generateResultHTML(title, countObj) {
+    let html = `<div class="result-item"><h4>${title}</h4><ul>`;
+    for (const [key, val] of Object.entries(countObj)) {
+      html += `<li>${escapeHTML(key)} : <strong>${val} 票</strong></li>`;
+    }
+    html += `</ul></div>`;
+    return html;
+  }
+
+  function escapeHTML(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>'"]/g, tag => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+    }[tag] || tag));
+  }
+</script>
+
+</body>
+</html>
