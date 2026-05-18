@@ -336,7 +336,7 @@
     <h1>ネプリーグアンケート</h1>
 
     <div class="q-block" id="block-grade">
-      <div class="q-label">担当学年</div>
+      <div class="q-label">学年</div>
       <div class="opts" data-key="grade">
         <button class="opt" data-value="1年">1年</button>
         <button class="opt" data-value="2年">2年</button>
@@ -570,7 +570,7 @@
     if (entries.length === 0) { showToast('データがありません'); return; }
 
     const qs = [
-      { key:'grade', label:'担当学年' },
+      { key:'grade', label:'学年' },
       { key:'role',  label:'役職' },
       { key:'q1',   label:'授業中に雑談をするかどうか (理科)' },
       { key:'q2',   label:'授業でほぼ毎回生徒を当てる (数学)' },
