@@ -5,426 +5,644 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>教員アンケート</title>
 <style>
-  /* 全体のベースデザイン（モダンなダークテーマ） */
-  body { 
-    font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif; 
-    margin: 0; 
-    padding: 15px; 
-    background-color: #121212; 
-    color: #e0e0e0; 
-  }
-  .container { 
-    max-width: 700px; 
-    margin: 0 auto; 
-    background-color: #1e1e1e; 
-    padding: 30px; 
-    border-radius: 12px; 
-    box-shadow: 0 8px 24px rgba(0,0,0,0.5); 
-    animation: fadeIn 0.5s ease;
-  }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-  
-  h1, h2 { 
-    text-align: center;
-    border-bottom: 2px solid #333; 
-    padding-bottom: 15px; 
-    margin-top: 0;
-    font-weight: 600;
-    color: #ffffff;
-  }
-  
-  /* 質問項目のデザイン */
-  .form-group { margin-bottom: 35px; }
-  .form-group label.question { 
-    display: block; 
-    margin-bottom: 15px; 
-    font-size: 1.1em; 
-    font-weight: bold;
-    border-left: 4px solid #4dabf7;
-    padding-left: 10px;
-    color: #ffffff;
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: #0a0a0a;
+    color: #e8e8e8;
+    min-height: 100vh;
+    padding: 20px;
   }
 
-  /* 押しやすいボタン風の選択肢 */
-  .options { 
-    display: grid; 
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); 
-    gap: 12px; 
+  .container {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 40px 0 80px;
   }
-  .radio-btn { cursor: pointer; display: block; }
-  .radio-btn input { display: none; /* 元の丸ポチを隠す */ }
-  .radio-btn span { 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    background-color: #2c2c2c; 
-    border: 2px solid #3a3a3a; 
-    border-radius: 8px; 
-    padding: 15px 10px; 
-    text-align: center; 
-    transition: all 0.2s ease; 
-    height: 100%; 
-    box-sizing: border-box;
+
+  h1 {
+    font-size: 1.3em;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    margin-bottom: 40px;
+    color: #e8e8e8;
+    border-bottom: 1px solid #222;
+    padding-bottom: 20px;
+  }
+
+  h2 {
+    font-size: 1.1em;
+    font-weight: 300;
+    letter-spacing: 0.15em;
+    margin-bottom: 30px;
+    color: #e8e8e8;
+    border-bottom: 1px solid #222;
+    padding-bottom: 16px;
+  }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .q-block { margin-bottom: 32px; }
+
+  .q-label {
+    font-size: 0.84em;
+    color: #888;
+    margin-bottom: 10px;
+    line-height: 1.6;
+    letter-spacing: 0.02em;
+  }
+
+  .opts { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .opt {
+    padding: 9px 16px;
+    border: 1px solid #2a2a2a;
+    background: #111;
+    color: #666;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.88em;
+    font-family: inherit;
+    transition: all 0.15s;
+    letter-spacing: 0.02em;
+  }
+
+  .opt:hover { border-color: #555; color: #ccc; }
+
+  .opt.sel {
+    border-color: #e8e8e8;
+    background: #1a1a1a;
+    color: #e8e8e8;
+  }
+
+  .divider { height: 1px; background: #1a1a1a; margin: 28px 0; }
+
+  .submit-btn {
+    width: 100%;
+    padding: 15px;
+    background: #e8e8e8;
+    color: #0a0a0a;
+    border: none;
+    border-radius: 4px;
     font-size: 0.95em;
+    font-family: inherit;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    margin-top: 16px;
   }
-  /* 選択された時のスタイル */
-  .radio-btn input:checked + span { 
-    background-color: #4dabf7; 
-    border-color: #4dabf7; 
-    color: #121212; 
-    font-weight: bold; 
-    box-shadow: 0 0 12px rgba(77, 171, 247, 0.4);
-  }
-  .radio-btn:hover span { border-color: #555; }
 
-  /* 入力欄・ボタンのデザイン */
-  input[type="password"] { 
-    width: 100%; padding: 15px; box-sizing: border-box; 
-    background-color: #2c2c2c; color: #fff; border: 2px solid #3a3a3a; 
-    border-radius: 8px; font-size: 1em; outline: none; transition: border-color 0.2s;
-  }
-  input[type="password"]:focus { border-color: #4dabf7; }
-  
-  .btn-submit { 
-    width: 100%; padding: 16px; background-color: #4dabf7; color: #121212; 
-    border: none; border-radius: 8px; cursor: pointer; font-size: 1.1em; font-weight: bold; 
-    transition: all 0.2s; margin-top: 10px;
-  }
-  .btn-submit:hover { background-color: #3bc9db; transform: translateY(-2px); }
-  .btn-submit:disabled { background-color: #555; color: #888; cursor: not-allowed; transform: none; }
-  
-  .btn-secondary { 
-    padding: 10px 20px; background-color: #333; color: #fff; border: 1px solid #555; 
-    border-radius: 6px; cursor: pointer; transition: 0.2s; 
-  }
-  .btn-secondary:hover { background-color: #444; }
+  .submit-btn:hover { opacity: 0.85; }
+  .submit-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
-  .hidden { display: none !important; }
-  
-  /* 管理者画面のデザイン */
-  .admin-link { text-align: center; margin-top: 40px; }
-  .admin-link a { color: #888; text-decoration: none; font-size: 0.9em; transition: color 0.2s; }
-  .admin-link a:hover { color: #4dabf7; text-decoration: underline; }
-  
-  .table-wrapper { overflow-x: auto; margin-top: 20px; border-radius: 8px; border: 1px solid #333; }
-  table { width: 100%; border-collapse: collapse; font-size: 0.9em; min-width: 800px; }
-  th, td { border-bottom: 1px solid #333; padding: 12px 15px; text-align: left; }
-  th { background-color: #252525; color: #aaa; font-weight: normal; white-space: nowrap; }
-  tr:hover { background-color: #2a2a2a; }
-  
-  .result-box { margin-top: 30px; }
-  .result-item { margin-bottom: 20px; background: #252525; padding: 20px; border-radius: 8px; border-left: 5px solid #4dabf7; }
-  .result-item h4 { margin: 0 0 15px 0; color: #fff; font-size: 1.1em; }
-  .result-bar-container { display: flex; align-items: center; margin-bottom: 10px; }
-  .result-label { width: 140px; font-size: 0.9em; color: #ccc; }
-  .result-bar-bg { flex-grow: 1; background-color: #333; height: 12px; border-radius: 6px; overflow: hidden; margin: 0 15px; }
-  .result-bar-fill { background-color: #4dabf7; height: 100%; width: 0%; transition: width 1s ease-out; }
-  .result-count { width: 40px; text-align: right; font-weight: bold; color: #4dabf7; }
+  .btn-row { display: flex; gap: 10px; margin-top: 16px; }
+
+  .btn-sub {
+    padding: 12px 22px;
+    background: transparent;
+    border: 1px solid #2a2a2a;
+    color: #666;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.88em;
+    transition: all 0.15s;
+  }
+
+  .btn-sub:hover { border-color: #555; color: #ccc; }
+
+  .btn-danger {
+    padding: 10px 18px;
+    background: transparent;
+    border: 1px solid #5a1a1a;
+    color: #c0392b;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.84em;
+    transition: all 0.15s;
+  }
+
+  .btn-danger:hover { background: #1a0808; }
+
+  .err-msg {
+    color: #e74c3c;
+    font-size: 0.82em;
+    margin-top: 8px;
+    display: none;
+  }
+
+  .pw-input {
+    width: 100%;
+    padding: 13px;
+    background: #111;
+    border: 1px solid #2a2a2a;
+    color: #e8e8e8;
+    border-radius: 4px;
+    font-size: 1em;
+    font-family: inherit;
+    outline: none;
+    margin-bottom: 14px;
+    transition: border-color 0.15s;
+  }
+
+  .pw-input:focus { border-color: #555; }
+
+  .admin-link {
+    text-align: center;
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 1px solid #1a1a1a;
+  }
+
+  .admin-link a {
+    color: #444;
+    text-decoration: none;
+    font-size: 0.78em;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: color 0.15s;
+  }
+
+  .admin-link a:hover { color: #888; }
+
+  /* 管理者テーブル */
+  .tbl-wrap { overflow-x: auto; margin-top: 16px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.8em; }
+
+  th {
+    background: #111;
+    color: #666;
+    font-weight: 500;
+    padding: 10px 12px;
+    border: 1px solid #1e1e1e;
+    text-align: left;
+    white-space: nowrap;
+    letter-spacing: 0.03em;
+  }
+
+  td {
+    padding: 9px 12px;
+    border: 1px solid #1a1a1a;
+    color: #888;
+    white-space: nowrap;
+  }
+
+  tr:hover td { background: #0f0f0f; }
+
+  /* 集計 */
+  .result-wrap { margin-top: 30px; }
+
+  .result-item {
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #1a1a1a;
+  }
+
+  .result-item:last-child { border-bottom: none; }
+
+  .result-title {
+    font-size: 0.8em;
+    color: #666;
+    margin-bottom: 12px;
+    letter-spacing: 0.03em;
+  }
+
+  .result-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  .result-name { font-size: 0.85em; color: #ccc; min-width: 150px; }
+
+  .bar-bg {
+    flex: 1;
+    height: 4px;
+    background: #1e1e1e;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    background: #e8e8e8;
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+
+  .result-count { font-size: 0.8em; color: #555; min-width: 60px; text-align: right; }
+
+  .badge {
+    display: inline-block;
+    background: #111;
+    border: 1px solid #222;
+    color: #666;
+    font-size: 0.78em;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    letter-spacing: 0.05em;
+  }
+
+  .admin-btns {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+
+  .loading-msg { color: #444; font-size: 0.88em; padding: 20px 0; }
+
+  .success-wrap { text-align: center; padding: 3rem 0; }
+  .success-icon { font-size: 2.5em; margin-bottom: 16px; }
+  .success-wrap p { color: #666; font-size: 0.9em; line-height: 1.8; }
+
+  .toast {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%) translateY(16px);
+    background: #e8e8e8;
+    color: #0a0a0a;
+    padding: 11px 26px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    opacity: 0;
+    transition: all 0.25s ease;
+    pointer-events: none;
+    z-index: 999;
+    white-space: nowrap;
+  }
+
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 480px) {
+    body { padding: 16px; }
+    .container { padding: 24px 0 60px; }
+    h1 { font-size: 1.1em; margin-bottom: 28px; }
+    .opt { padding: 10px 14px; font-size: 0.9em; }
+  }
 </style>
 </head>
 <body>
 
-<!-- アンケート回答画面 -->
-<div class="container" id="survey-section">
-  <h1>教員アンケート</h1>
-  <p style="text-align: center; color: #aaa; margin-bottom: 30px; font-size: 0.9em;">
-    ※回答は自動的に保存されます。再度送信すると上書きされます。
-  </p>
-  
-  <form id="surveyForm">
-    <div class="form-group">
-      <label class="question">担当学年（各学年団）</label>
-      <div class="options">
-        <label class="radio-btn"><input type="radio" name="grade" value="1年" required><span>1年</span></label>
-        <label class="radio-btn"><input type="radio" name="grade" value="2年"><span>2年</span></label>
-        <label class="radio-btn"><input type="radio" name="grade" value="3年"><span>3年</span></label>
+<div class="container">
+
+  <!-- アンケート画面 -->
+  <div id="sv-survey" class="section active">
+    <h1>教員アンケート</h1>
+
+    <div class="q-block">
+      <div class="q-label">担当学年</div>
+      <div class="opts" data-key="grade">
+        <button class="opt" data-value="1年">1年</button>
+        <button class="opt" data-value="2年">2年</button>
+        <button class="opt" data-value="3年">3年</button>
       </div>
     </div>
 
-    <div class="form-group">
-      <label class="question">役職</label>
-      <div class="options">
-        <label class="radio-btn"><input type="radio" name="role" value="一般" required><span>一般</span></label>
-        <label class="radio-btn"><input type="radio" name="role" value="学年主任"><span>学年主任</span></label>
-        <label class="radio-btn"><input type="radio" name="role" value="副主任"><span>副主任</span></label>
+    <div class="q-block">
+      <div class="q-label">役職</div>
+      <div class="opts" data-key="role">
+        <button class="opt" data-value="一般">一般</button>
+        <button class="opt" data-value="学年主任">学年主任</button>
+        <button class="opt" data-value="副主任">副主任</button>
       </div>
     </div>
 
-    <div class="form-group">
-      <label class="question">授業中に雑談をするかどうか（理科）</label>
-      <div class="options">
-        <label class="radio-btn"><input type="radio" name="q1" value="はい" required><span>はい</span></label>
-        <label class="radio-btn"><input type="radio" name="q1" value="いいえ"><span>いいえ</span></label>
-        <label class="radio-btn"><input type="radio" name="q1" value="分からない"><span>分からない</span></label>
+    <div class="divider"></div>
+
+    <div class="q-block">
+      <div class="q-label">授業中に雑談をするかどうか（理科）</div>
+      <div class="opts" data-key="q1">
+        <button class="opt" data-value="はい">はい</button>
+        <button class="opt" data-value="いいえ">いいえ</button>
+        <button class="opt" data-value="分からない">分からない</button>
       </div>
     </div>
 
-    <div class="form-group">
-      <label class="question">授業でほぼ毎回生徒を当てる（数学）</label>
-      <div class="options">
-        <label class="radio-btn"><input type="radio" name="q2" value="はい" required><span>はい</span></label>
-        <label class="radio-btn"><input type="radio" name="q2" value="いいえ"><span>いいえ</span></label>
+    <div class="q-block">
+      <div class="q-label">授業でほぼ毎回生徒を当てる（数学）</div>
+      <div class="opts" data-key="q2">
+        <button class="opt" data-value="はい">はい</button>
+        <button class="opt" data-value="いいえ">いいえ</button>
       </div>
     </div>
 
-    <div class="form-group">
-      <label class="question">結婚しているかどうか（全員）</label>
-      <div class="options">
-        <label class="radio-btn"><input type="radio" name="q3" value="結婚している" required><span>結婚している</span></label>
-        <label class="radio-btn"><input type="radio" name="q3" value="恋人がいる"><span>恋人がいる</span></label>
-        <label class="radio-btn"><input type="radio" name="q3" value="未婚かつ恋人がいない"><span>未婚かつ恋人がいない</span></label>
-        <label class="radio-btn"><input type="radio" name="q3" value="秘密"><span>秘密</span></label>
+    <div class="q-block">
+      <div class="q-label">結婚しているかどうか（全員）</div>
+      <div class="opts" data-key="q3">
+        <button class="opt" data-value="結婚している">結婚している</button>
+        <button class="opt" data-value="恋人がいる">恋人がいる</button>
+        <button class="opt" data-value="未婚かつ恋人がいない">未婚かつ恋人がいない</button>
+        <button class="opt" data-value="秘密">秘密</button>
       </div>
     </div>
 
-    <div class="form-group">
-      <label class="question">怒ったふりをしたことがあるか（学年主任・副主任）</label>
-      <div class="options">
-        <label class="radio-btn"><input type="radio" name="q4" value="はい" required><span>はい</span></label>
-        <label class="radio-btn"><input type="radio" name="q4" value="いいえ"><span>いいえ</span></label>
-        <label class="radio-btn"><input type="radio" name="q4" value="覚えてない分からない"><span>覚えてない分からない</span></label>
+    <div class="q-block">
+      <div class="q-label">怒ったふりをしたことがあるか（学年主任・副主任）</div>
+      <div class="opts" data-key="q4">
+        <button class="opt" data-value="はい">はい</button>
+        <button class="opt" data-value="いいえ">いいえ</button>
+        <button class="opt" data-value="覚えてない">覚えてない</button>
       </div>
     </div>
 
-    <div class="form-group">
-      <label class="question">正直課題を出すのがめんどくさいと思ったことがあるか（英語）</label>
-      <div class="options">
-        <label class="radio-btn"><input type="radio" name="q5" value="はい" required><span>はい</span></label>
-        <label class="radio-btn"><input type="radio" name="q5" value="いいえ"><span>いいえ</span></label>
+    <div class="q-block">
+      <div class="q-label">正直課題を出すのがめんどくさいと思ったことがあるか（英語）</div>
+      <div class="opts" data-key="q5">
+        <button class="opt" data-value="はい">はい</button>
+        <button class="opt" data-value="いいえ">いいえ</button>
       </div>
     </div>
 
-    <button type="submit" class="btn-submit">アンケートを送信する</button>
-  </form>
-  
-  <div class="admin-link">
-    <a href="#" onclick="showLogin()">管理者モードはこちら</a>
+    <div id="sv-err" class="err-msg">すべての質問に回答してください。</div>
+    <button class="submit-btn" id="submit-btn" onclick="submitSurvey()">送信する</button>
+
+    <div class="admin-link">
+      <a onclick="showSection('sv-login')">管理者モード →</a>
+    </div>
   </div>
+
+  <!-- 完了画面 -->
+  <div id="sv-done" class="section">
+    <div class="success-wrap">
+      <div class="success-icon">✓</div>
+      <h1 style="border:none; text-align:center; margin-bottom:16px;">送信完了</h1>
+      <p>ご回答ありがとうございました。<br>再度送信すると回答が上書きされます。</p>
+      <div class="btn-row" style="justify-content:center; margin-top:2rem;">
+        <button class="btn-sub" onclick="showSection('sv-survey')">回答を修正する</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ログイン画面 -->
+  <div id="sv-login" class="section">
+    <h2>管理者ログイン</h2>
+    <input type="password" class="pw-input" id="sv-pw" placeholder="パスワードを入力"
+      onkeydown="if(event.key==='Enter')doLogin()">
+    <div id="pw-err" class="err-msg" style="margin-bottom:10px;">パスワードが違います。</div>
+    <div class="btn-row">
+      <button class="submit-btn" style="margin-top:0;" onclick="doLogin()">ログイン</button>
+      <button class="btn-sub" onclick="showSection('sv-survey')">戻る</button>
+    </div>
+  </div>
+
+  <!-- 管理者画面 -->
+  <div id="sv-admin" class="section">
+    <h2>管理者モード — 回答一覧</h2>
+    <div class="admin-btns">
+      <button class="btn-sub" onclick="showSection('sv-survey')">← 戻る</button>
+      <button class="btn-sub" onclick="loadAdmin()">🔄 更新</button>
+      <button class="btn-sub" onclick="calcResults()">📊 集計する</button>
+      <button class="btn-danger" onclick="clearAll()">🗑 全削除</button>
+    </div>
+    <div id="admin-content"><div class="loading-msg">読み込み中...</div></div>
+    <div id="result-area" class="result-wrap"></div>
+  </div>
+
 </div>
 
-<!-- 管理者ログイン画面 -->
-<div class="container hidden" id="login-section">
-  <h2>管理者ログイン</h2>
-  <div class="form-group" style="margin-top: 30px;">
-    <input type="password" id="adminPassword" placeholder="パスワードを入力">
-  </div>
-  <div style="display: flex; gap: 10px;">
-    <button class="btn-submit" onclick="login()" style="margin-top: 0; flex: 2;">ログイン</button>
-    <button class="btn-secondary" onclick="showSurvey()" style="flex: 1;">戻る</button>
-  </div>
-</div>
+<div class="toast" id="toast"></div>
 
-<!-- 管理者画面（一覧・集計） -->
-<div class="container hidden" id="admin-section" style="max-width: 900px;">
-  <h2>回答データ管理</h2>
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-    <button class="btn-secondary" onclick="showSurvey()">＜ アンケート画面に戻る</button>
-    <button class="btn-submit" onclick="calculateResults()" style="width: auto; margin: 0; padding: 10px 20px;">グラフで集計する</button>
-  </div>
-  
-  <div class="table-wrapper">
-    <table id="answersTable">
-      <thead>
-        <tr>
-          <th>回答者</th>
-          <th>学年</th>
-          <th>役職</th>
-          <th>Q1(理科)</th>
-          <th>Q2(数学)</th>
-          <th>Q3(結婚)</th>
-          <th>Q4(怒ったふり)</th>
-          <th>Q5(英語)</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- データがここに挿入されます -->
-      </tbody>
-    </table>
-  </div>
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+  import { getDatabase, ref, set, get, remove, child }
+    from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
 
-  <div id="resultsArea" class="result-box hidden">
-    <!-- 集計結果がここに挿入されます -->
-  </div>
-</div>
+  const firebaseConfig = {
+    apiKey: "AIzaSyApCa9WybT_XLI6VlKHFI1vtcaVKUbq-C4",
+    authDomain: "question-2506a.firebaseapp.com",
+    databaseURL: "https://question-2506a-default-rtdb.firebaseio.com",
+    projectId: "question-2506a",
+    storageBucket: "question-2506a.firebasestorage.app",
+    messagingSenderId: "937214412547",
+    appId: "1:937214412547:web:8ceb379d3e938106420b36"
+  };
 
-<script>
-  // ★★★ ここに新しいGASのURLを貼り付けてください ★★★
-  const GAS_URL = 'https://script.google.com/macros/s/AKfycbxblg1__LxLEwuqFgKimAICi8fJqtUb17udhxvZavkYGzFuTpeMlLBW0ldUE56m4OQH2A/exec';
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
 
-  // 端末ごとの固有IDを生成・取得（名前の代わりに使用）
-  let userId = localStorage.getItem('survey_user_id');
-  if (!userId) {
-    userId = 'user_' + Math.random().toString(36).substr(2, 9);
-    localStorage.setItem('survey_user_id', userId);
+  // 端末ごとのIDを生成（localStorageで管理）
+  function getUid() {
+    let id = localStorage.getItem('sv_uid');
+    if (!id) {
+      id = 'u_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+      localStorage.setItem('sv_uid', id);
+    }
+    return id;
   }
 
-  // アンケート送信時の処理
-  document.getElementById('surveyForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    if (GAS_URL === 'ここに新しいURLを貼り付ける') {
-      alert('エラー：GASのURLが設定されていません。');
-      return;
+  // グローバルに公開（onclick から呼べるように）
+  window._firebase = { db, ref, set, get, remove, child, getUid };
+
+  // 回答送信
+  window.submitSurvey = async function() {
+    const required = ['grade','role','q1','q2','q3','q4','q5'];
+    const missing = required.filter(k => !window._ans[k]);
+    const errEl = document.getElementById('sv-err');
+    if (missing.length > 0) { errEl.style.display = 'block'; return; }
+    errEl.style.display = 'none';
+
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.textContent = '送信中...';
+
+    try {
+      const uid = getUid();
+      const { db, ref, set } = window._firebase;
+      await set(ref(db, 'answers/' + uid), {
+        ...window._ans,
+        timestamp: Date.now()
+      });
+      showSection('sv-done');
+      showToast('送信しました！');
+    } catch(e) {
+      showToast('送信失敗。通信環境を確認してください。');
+      console.error(e);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '送信する';
     }
+  };
 
-    const submitBtn = e.target.querySelector('button[type="submit"]');
-    submitBtn.disabled = true;
-    submitBtn.innerText = '送信しています...';
+  // 管理者データ読み込み
+  window.loadAdmin = async function() {
+    const contentEl = document.getElementById('admin-content');
+    contentEl.innerHTML = '<div class="loading-msg">読み込み中...</div>';
+    document.getElementById('result-area').innerHTML = '';
 
-    const formData = new FormData(e.target);
-    const data = {
-      userId: userId, // 自動生成したIDを送信
-      grade: formData.get('grade'), role: formData.get('role'),
-      q1: formData.get('q1'), q2: formData.get('q2'), q3: formData.get('q3'),
-      q4: formData.get('q4'), q5: formData.get('q5')
-    };
+    try {
+      const { db, ref, get } = window._firebase;
+      const snap = await get(ref(db, 'answers'));
+      if (!snap.exists()) {
+        contentEl.innerHTML = '<div class="loading-msg">まだ回答がありません。</div>';
+        window._adminData = [];
+        return;
+      }
 
-    fetch(GAS_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify(data)
-    })
-    .then(response => response.json())
-    .then(result => {
-      alert('送信完了しました！ご協力ありがとうございます。');
-      // 送信後も選択状態は残しておく（自分が何を選んだか分かるように）
-      submitBtn.innerText = '回答を上書き送信する';
-    })
-    .catch(error => {
-      alert('送信に失敗しました。通信環境を確認してください。');
-      submitBtn.innerText = 'アンケートを送信する';
-    })
-    .finally(() => {
-      submitBtn.disabled = false;
+      const data = snap.val();
+      const entries = Object.values(data);
+      window._adminData = entries;
+
+      const qs = ['grade','role','q1','q2','q3','q4','q5'];
+      const ths = ['学年','役職','Q1理科','Q2数学','Q3結婚','Q4怒ったふり','Q5英語'];
+
+      let html = `<span class="badge">総回答数：${entries.length} 名</span>
+        <div class="tbl-wrap"><table><thead><tr><th>回答者</th>`;
+      ths.forEach(t => html += `<th>${t}</th>`);
+      html += '</tr></thead><tbody>';
+      entries.forEach((d, i) => {
+        html += `<tr><td>回答者${i+1}</td>`;
+        qs.forEach(k => html += `<td>${esc(d[k]||'')}</td>`);
+        html += '</tr>';
+      });
+      html += '</tbody></table></div>';
+      contentEl.innerHTML = html;
+    } catch(e) {
+      contentEl.innerHTML = '<div class="loading-msg" style="color:#e74c3c;">データの取得に失敗しました。</div>';
+      console.error(e);
+    }
+  };
+
+  // 集計
+  window.calcResults = function() {
+    const entries = window._adminData || [];
+    const area = document.getElementById('result-area');
+    if (entries.length === 0) { showToast('データがありません'); return; }
+
+    const qs = [
+      { key:'grade', label:'担当学年' },
+      { key:'role',  label:'役職' },
+      { key:'q1',   label:'授業中に雑談をするかどうか（理科）' },
+      { key:'q2',   label:'授業でほぼ毎回生徒を当てる（数学）' },
+      { key:'q3',   label:'結婚しているかどうか（全員）' },
+      { key:'q4',   label:'怒ったふりをしたことがあるか（学年主任・副主任）' },
+      { key:'q5',   label:'正直課題を出すのがめんどくさいと思ったことがあるか（英語）' },
+    ];
+
+    let html = '<div style="height:1px;background:#1a1a1a;margin-bottom:24px;"></div>';
+    html += `<span class="badge">集計結果 — 総回答数 ${entries.length} 名</span>`;
+
+    qs.forEach(q => {
+      const counts = {};
+      entries.forEach(d => { if(d[q.key]) counts[d[q.key]] = (counts[d[q.key]]||0)+1; });
+      const max = Math.max(...Object.values(counts), 1);
+
+      html += `<div class="result-item"><div class="result-title">${q.label}</div>`;
+      Object.entries(counts).sort((a,b)=>b[1]-a[1]).forEach(([label,cnt]) => {
+        const pct = Math.round(cnt / entries.length * 100);
+        const w = Math.round(cnt / max * 100);
+        html += `<div class="result-row">
+          <div class="result-name">${esc(label)}</div>
+          <div class="bar-bg"><div class="bar-fill" style="width:${w}%"></div></div>
+          <div class="result-count">${cnt}票 (${pct}%)</div>
+        </div>`;
+      });
+      html += '</div>';
+    });
+
+    area.innerHTML = html;
+  };
+
+  // 全削除
+  window.clearAll = async function() {
+    if (!confirm('全データを削除しますか？この操作は取り消せません。')) return;
+    try {
+      const { db, ref, remove } = window._firebase;
+      await remove(ref(db, 'answers'));
+      await window.loadAdmin();
+      document.getElementById('result-area').innerHTML = '';
+      showToast('削除しました');
+    } catch(e) {
+      showToast('削除に失敗しました');
+    }
+  };
+
+  // 前回の回答を復元
+  async function restorePrev() {
+    const uid = getUid();
+    try {
+      const { db, ref, get } = window._firebase;
+      const snap = await get(ref(db, 'answers/' + uid));
+      if (!snap.exists()) return;
+      const d = snap.val();
+      Object.keys(d).forEach(k => {
+        const g = document.querySelector(`.opts[data-key="${k}"]`);
+        if (!g) return;
+        g.querySelectorAll('.opt').forEach(b => {
+          if (b.dataset.value === d[k]) {
+            b.classList.add('sel');
+            window._ans[k] = d[k];
+          }
+        });
+      });
+    } catch(e) {}
+  }
+
+  restorePrev();
+</script>
+
+<script>
+  // 回答状態管理
+  window._ans = {};
+  window._adminData = [];
+
+  // ボタン選択
+  document.querySelectorAll('.opts').forEach(g => {
+    g.querySelectorAll('.opt').forEach(b => {
+      b.addEventListener('click', () => {
+        g.querySelectorAll('.opt').forEach(x => x.classList.remove('sel'));
+        b.classList.add('sel');
+        window._ans[g.dataset.key] = b.dataset.value;
+      });
     });
   });
 
-  // 画面切り替え関数
-  function switchSection(showId) {
-    ['survey-section', 'login-section', 'admin-section'].forEach(id => {
-      document.getElementById(id).classList.add('hidden');
-    });
-    document.getElementById(showId).classList.remove('hidden');
-  }
+  // 画面切り替え
+  window.showSection = function(id) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  };
 
-  function showLogin() { switchSection('login-section'); document.getElementById('adminPassword').value = ''; }
-  function showSurvey() { switchSection('survey-section'); }
-
-  // ログイン処理
-  function login() {
-    const pass = document.getElementById('adminPassword').value;
-    if (pass === 'Sample1') {
-      switchSection('admin-section');
-      document.getElementById('resultsArea').classList.add('hidden');
-      loadAdminData();
+  // ログイン
+  window.doLogin = function() {
+    const pw = document.getElementById('sv-pw').value;
+    const errEl = document.getElementById('pw-err');
+    if (pw === 'Sample1') {
+      errEl.style.display = 'none';
+      document.getElementById('sv-pw').value = '';
+      showSection('sv-admin');
+      window.loadAdmin();
     } else {
-      alert('パスワードが間違っています。');
+      errEl.style.display = 'block';
     }
-  }
+  };
 
-  // サーバーからデータを取得して一覧表示
-  let currentData = [];
-  function loadAdminData() {
-    const tbody = document.querySelector('#answersTable tbody');
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:30px;">データを読み込み中...</td></tr>';
-    
-    fetch(GAS_URL)
-      .then(response => response.json())
-      .then(data => {
-        currentData = data;
-        tbody.innerHTML = '';
-        if(data.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:30px;">まだ回答がありません。</td></tr>';
-          return;
-        }
-        // データをテーブルに挿入（名前の代わりに「回答者1, 2...」と表示）
-        data.forEach((row, index) => {
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td style="color:#4dabf7;">回答者 ${index + 1}</td>
-            <td>${escapeHTML(row.grade)}</td><td>${escapeHTML(row.role)}</td>
-            <td>${escapeHTML(row.q1)}</td><td>${escapeHTML(row.q2)}</td>
-            <td>${escapeHTML(row.q3)}</td><td>${escapeHTML(row.q4)}</td>
-            <td>${escapeHTML(row.q5)}</td>
-          `;
-          tbody.appendChild(tr);
-        });
-      })
-      .catch(error => {
-        tbody.innerHTML = '<tr><td colspan="8" style="color:#ff6b6b; text-align:center;">データの取得に失敗しました。</td></tr>';
-      });
-  }
+  // トースト
+  window.showToast = function(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  };
 
-  // 集計処理（バーグラフ風に表示）
-  function calculateResults() {
-    const resultsArea = document.getElementById('resultsArea');
-    resultsArea.innerHTML = '';
-    resultsArea.classList.remove('hidden');
-
-    if (currentData.length === 0) {
-      resultsArea.innerHTML = '<p>集計するデータがありません。</p>';
-      return;
-    }
-
-    const counts = { grade: {}, role: {}, q1: {}, q2: {}, q3: {}, q4: {}, q5: {} };
-    let total = currentData.length;
-
-    currentData.forEach(data => {
-      countItem(counts.grade, data.grade); countItem(counts.role, data.role);
-      countItem(counts.q1, data.q1); countItem(counts.q2, data.q2);
-      countItem(counts.q3, data.q3); countItem(counts.q4, data.q4);
-      countItem(counts.q5, data.q5);
-    });
-
-    let html = `<h3 style="text-align:center; color:#4dabf7; margin-bottom:30px;">総回答数: ${total} 名</h3>`;
-    html += generateBarChartHTML('担当学年', counts.grade, total);
-    html += generateBarChartHTML('役職', counts.role, total);
-    html += generateBarChartHTML('Q1: 授業中に雑談をするかどうか（理科）', counts.q1, total);
-    html += generateBarChartHTML('Q2: 授業でほぼ毎回生徒を当てる（数学）', counts.q2, total);
-    html += generateBarChartHTML('Q3: 結婚しているかどうか（全員）', counts.q3, total);
-    html += generateBarChartHTML('Q4: 怒ったふりをしたことがあるか（学年主任・副主任）', counts.q4, total);
-    html += generateBarChartHTML('Q5: 正直課題を出すのがめんどくさいと思ったことがあるか（英語）', counts.q5, total);
-
-    resultsArea.innerHTML = html;
-    
-    // グラフのアニメーション発火
-    setTimeout(() => {
-      document.querySelectorAll('.result-bar-fill').forEach(bar => {
-        bar.style.width = bar.getAttribute('data-width');
-      });
-    }, 50);
-  }
-
-  function countItem(obj, val) {
-    if (!val) return;
-    obj[val] = (obj[val] || 0) + 1;
-  }
-
-  // グラフ風のHTMLを生成する関数
-  function generateBarChartHTML(title, countObj, total) {
-    let html = `<div class="result-item"><h4>${title}</h4>`;
-    for (const [key, val] of Object.entries(countObj)) {
-      const percentage = Math.round((val / total) * 100);
-      html += `
-        <div class="result-bar-container">
-          <div class="result-label">${escapeHTML(key)}</div>
-          <div class="result-bar-bg">
-            <div class="result-bar-fill" data-width="${percentage}%"></div>
-          </div>
-          <div class="result-count">${val}票</div>
-        </div>
-      `;
-    }
-    html += `</div>`;
-    return html;
-  }
-
-  function escapeHTML(str) {
-    if (!str) return '';
-    return String(str).replace(/[&<>'"]/g, tag => ({
-      '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
-    }[tag] || tag));
-  }
+  // エスケープ
+  window.esc = function(s) {
+    return String(s||'').replace(/[&<>'"]/g, c =>
+      ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+  };
 </script>
 
 </body>
