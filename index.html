@@ -336,7 +336,7 @@
     <h1>ネプリーグアンケート</h1>
 
     <div class="q-block" id="block-grade">
-      <div class="q-label">学年</div>
+      <div class="q-label">担当学年</div>
       <div class="opts" data-key="grade">
         <button class="opt" data-value="1年">1年</button>
         <button class="opt" data-value="2年">2年</button>
@@ -347,8 +347,8 @@
     <div class="q-block" id="block-role">
       <div class="q-label">役職</div>
       <div class="opts" data-key="role">
-        <button class="opt" data-value="一般生徒">一般生徒</button>
-        <button class="opt" data-value="学年主任">学年主任</button>
+        <button class="opt" data-value="一般">一般</button>
+        <button class="opt" data-value="担当学年主任">担当学年主任</button>
         <button class="opt" data-value="副主任">副主任</button>
       </div>
     </div>
@@ -381,7 +381,7 @@
     </div>
 
     <div class="q-block" id="block-q4">
-      <div class="q-label">怒ったふりをしたことがあるか <span>(学年主任・副主任)</span></div>
+      <div class="q-label">怒ったふりをしたことがあるか <span>(担当学年主任・副主任)</span></div>
       <div class="opts" data-key="q4">
         <button class="opt" data-value="はい">はい</button>
         <button class="opt" data-value="いいえ">いいえ</button>
@@ -545,7 +545,7 @@
       window._adminData = entries;
 
       const qs = ['grade','role','q1','q2','q3','q4','q5'];
-      const ths = ['学年','役職','Q1(理科)','Q2(数学)','Q3(結婚)','Q4(怒ふり)','Q5(英語)'];
+      const ths = ['担当学年','役職','Q1(理科)','Q2(数学)','Q3(結婚)','Q4(怒ふり)','Q5(英語)'];
 
       let html = `<span class="badge">総回答数：${entries.length} 名</span>
         <div class="tbl-wrap"><table><thead><tr><th>回答者ID</th>`;
@@ -570,12 +570,12 @@
     if (entries.length === 0) { showToast('データがありません'); return; }
 
     const qs = [
-      { key:'grade', label:'学年' },
+      { key:'grade', label:'担当学年' },
       { key:'role',  label:'役職' },
       { key:'q1',   label:'授業中に雑談をするかどうか (理科)' },
       { key:'q2',   label:'授業でほぼ毎回生徒を当てる (数学)' },
       { key:'q3',   label:'結婚しているかどうか (全員)' },
-      { key:'q4',   label:'怒ったふりをしたことがあるか (学年主任・副主任)' },
+      { key:'q4',   label:'怒ったふりをしたことがあるか (担当学年主任・副主任)' },
       { key:'q5',   label:'正直課題を出すのがめんどくさいか (英語)' },
     ];
 
