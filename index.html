@@ -5,304 +5,263 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>教員アンケート</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
+
+  :root {
+    --bg-color: #0f1115;
+    --card-bg: #1a1d24;
+    --text-main: #f3f4f6;
+    --text-sub: #9ca3af;
+    --accent: #6366f1;
+    --accent-hover: #4f46e5;
+    --border: #2d3139;
+    --error: #ef4444;
+    --success: #10b981;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: 'Noto Sans JP', sans-serif;
-    background: #0a0a0a;
-    color: #e8e8e8;
+    font-family: 'Inter', 'Noto Sans JP', sans-serif;
+    background: var(--bg-color);
+    color: var(--text-main);
     min-height: 100vh;
-    padding: 20px;
+    line-height: 1.6;
+  }
+
+  /* プログレスバー */
+  .progress-container {
+    position: fixed;
+    top: 0; left: 0; width: 100%;
+    height: 4px;
+    background: var(--border);
+    z-index: 100;
+    display: none;
+  }
+  .progress-bar {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width var(--transition);
   }
 
   .container {
-    max-width: 680px;
+    max-width: 600px;
     margin: 0 auto;
-    padding: 40px 0 80px;
+    padding: 40px 20px 80px;
   }
 
-  h1 {
-    font-size: 1.3em;
-    font-weight: 300;
-    letter-spacing: 0.2em;
-    margin-bottom: 40px;
-    color: #e8e8e8;
-    border-bottom: 1px solid #222;
-    padding-bottom: 20px;
-  }
-
-  h2 {
-    font-size: 1.1em;
-    font-weight: 300;
-    letter-spacing: 0.15em;
+  h1, h2 {
+    font-weight: 600;
+    letter-spacing: 0.05em;
     margin-bottom: 30px;
-    color: #e8e8e8;
-    border-bottom: 1px solid #222;
-    padding-bottom: 16px;
+    color: var(--text-main);
+    text-align: center;
   }
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.25rem; }
 
-  .section { display: none; }
+  .section { display: none; animation: fadeIn 0.4s ease; }
   .section.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-  .q-block { margin-bottom: 32px; }
+  /* 質問カード */
+  .q-block {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    margin-bottom: 24px;
+    transition: var(--transition);
+  }
+  .q-block.error-highlight {
+    border-color: var(--error);
+    box-shadow: 0 0 0 1px var(--error);
+    animation: shake 0.4s;
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+  }
 
   .q-label {
-    font-size: 0.84em;
-    color: #888;
-    margin-bottom: 10px;
-    line-height: 1.6;
-    letter-spacing: 0.02em;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-main);
+    margin-bottom: 16px;
   }
+  .q-label span { color: var(--text-sub); font-size: 0.8em; margin-left: 8px; font-weight: normal; }
 
-  .opts { display: flex; flex-wrap: wrap; gap: 8px; }
+  .opts { display: flex; flex-wrap: wrap; gap: 10px; }
 
   .opt {
-    padding: 9px 16px;
-    border: 1px solid #2a2a2a;
-    background: #111;
-    color: #666;
-    border-radius: 4px;
+    flex: 1 1 calc(50% - 10px); /* スマホでは2列 */
+    min-width: 120px;
+    padding: 12px 16px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-sub);
+    border-radius: var(--radius-md);
     cursor: pointer;
-    font-size: 0.88em;
+    font-size: 0.9rem;
     font-family: inherit;
-    transition: all 0.15s;
-    letter-spacing: 0.02em;
+    font-weight: 500;
+    transition: var(--transition);
+    text-align: center;
   }
-
-  .opt:hover { border-color: #555; color: #ccc; }
-
+  .opt:hover { border-color: var(--text-sub); color: var(--text-main); }
+  
   .opt.sel {
-    border-color: #e8e8e8;
-    background: #1a1a1a;
-    color: #e8e8e8;
+    background: rgba(99, 102, 241, 0.1);
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent);
   }
-
-  .divider { height: 1px; background: #1a1a1a; margin: 28px 0; }
 
   .submit-btn {
     width: 100%;
-    padding: 15px;
-    background: #e8e8e8;
-    color: #0a0a0a;
+    padding: 16px;
+    background: var(--accent);
+    color: #fff;
     border: none;
-    border-radius: 4px;
-    font-size: 0.95em;
+    border-radius: var(--radius-md);
+    font-size: 1rem;
     font-family: inherit;
-    font-weight: 700;
-    letter-spacing: 0.1em;
+    font-weight: 600;
+    letter-spacing: 0.05em;
     cursor: pointer;
-    transition: opacity 0.15s;
-    margin-top: 16px;
+    transition: var(--transition);
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
   }
-
-  .submit-btn:hover { opacity: 0.85; }
-  .submit-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-
-  .btn-row { display: flex; gap: 10px; margin-top: 16px; }
+  .submit-btn:hover { background: var(--accent-hover); }
+  .submit-btn:disabled { opacity: 0.7; cursor: not-allowed; }
 
   .btn-sub {
-    padding: 12px 22px;
-    background: transparent;
-    border: 1px solid #2a2a2a;
-    color: #666;
-    border-radius: 4px;
+    padding: 12px 20px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    border-radius: var(--radius-md);
     cursor: pointer;
     font-family: inherit;
-    font-size: 0.88em;
-    transition: all 0.15s;
+    font-size: 0.9rem;
+    transition: var(--transition);
   }
-
-  .btn-sub:hover { border-color: #555; color: #ccc; }
+  .btn-sub:hover { background: var(--border); }
 
   .btn-danger {
-    padding: 10px 18px;
-    background: transparent;
-    border: 1px solid #5a1a1a;
-    color: #c0392b;
-    border-radius: 4px;
+    padding: 12px 20px;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: var(--error);
+    border-radius: var(--radius-md);
     cursor: pointer;
     font-family: inherit;
-    font-size: 0.84em;
-    transition: all 0.15s;
+    font-size: 0.9rem;
+    transition: var(--transition);
   }
-
-  .btn-danger:hover { background: #1a0808; }
-
-  .err-msg {
-    color: #e74c3c;
-    font-size: 0.82em;
-    margin-top: 8px;
-    display: none;
-  }
+  .btn-danger:hover { background: rgba(239, 68, 68, 0.2); }
 
   .pw-input {
     width: 100%;
-    padding: 13px;
-    background: #111;
-    border: 1px solid #2a2a2a;
-    color: #e8e8e8;
-    border-radius: 4px;
-    font-size: 1em;
+    padding: 14px;
+    background: var(--bg-color);
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    border-radius: var(--radius-md);
+    font-size: 1rem;
     font-family: inherit;
     outline: none;
-    margin-bottom: 14px;
-    transition: border-color 0.15s;
+    margin-bottom: 16px;
+    transition: var(--transition);
   }
-
-  .pw-input:focus { border-color: #555; }
+  .pw-input:focus { border-color: var(--accent); }
 
   .admin-link {
     text-align: center;
-    margin-top: 50px;
-    padding-top: 20px;
-    border-top: 1px solid #1a1a1a;
+    margin-top: 40px;
   }
-
   .admin-link a {
-    color: #444;
-    text-decoration: none;
-    font-size: 0.78em;
-    letter-spacing: 0.1em;
+    color: var(--text-sub);
+    text-decoration: underline;
+    font-size: 0.85rem;
     cursor: pointer;
-    transition: color 0.15s;
+    transition: var(--transition);
   }
+  .admin-link a:hover { color: var(--text-main); }
 
-  .admin-link a:hover { color: #888; }
+  /* 管理者テーブル＆結果 */
+  .tbl-wrap { overflow-x: auto; margin-top: 20px; border-radius: var(--radius-md); border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  th { background: var(--card-bg); color: var(--text-sub); padding: 12px; border-bottom: 1px solid var(--border); text-align: left; white-space: nowrap; }
+  td { padding: 12px; border-bottom: 1px solid var(--border); color: var(--text-main); white-space: nowrap; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
 
-  /* 管理者テーブル */
-  .tbl-wrap { overflow-x: auto; margin-top: 16px; }
+  .result-wrap { margin-top: 40px; }
+  .result-item { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 20px; }
+  .result-title { font-size: 0.95rem; font-weight: 500; color: var(--text-main); margin-bottom: 16px; }
+  .result-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .result-row:last-child { margin-bottom: 0; }
+  .result-name { font-size: 0.85rem; color: var(--text-sub); min-width: 140px; }
+  .bar-bg { flex: 1; height: 8px; background: var(--bg-color); border-radius: 4px; overflow: hidden; }
+  .bar-fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.8s ease-out; }
+  .result-count { font-size: 0.85rem; color: var(--text-main); min-width: 70px; text-align: right; }
+  
+  .badge { display: inline-block; background: rgba(99, 102, 241, 0.1); color: var(--accent); font-size: 0.8rem; font-weight: 500; padding: 6px 12px; border-radius: 20px; margin-bottom: 16px; }
 
-  table { width: 100%; border-collapse: collapse; font-size: 0.8em; }
+  .admin-btns { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; }
+  .loading-msg { color: var(--text-sub); font-size: 0.9rem; text-align: center; padding: 40px 0; }
 
-  th {
-    background: #111;
-    color: #666;
-    font-weight: 500;
-    padding: 10px 12px;
-    border: 1px solid #1e1e1e;
-    text-align: left;
-    white-space: nowrap;
-    letter-spacing: 0.03em;
-  }
-
-  td {
-    padding: 9px 12px;
-    border: 1px solid #1a1a1a;
-    color: #888;
-    white-space: nowrap;
-  }
-
-  tr:hover td { background: #0f0f0f; }
-
-  /* 集計 */
-  .result-wrap { margin-top: 30px; }
-
-  .result-item {
-    margin-bottom: 24px;
-    padding-bottom: 24px;
-    border-bottom: 1px solid #1a1a1a;
-  }
-
-  .result-item:last-child { border-bottom: none; }
-
-  .result-title {
-    font-size: 0.8em;
-    color: #666;
-    margin-bottom: 12px;
-    letter-spacing: 0.03em;
-  }
-
-  .result-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 8px;
-  }
-
-  .result-name { font-size: 0.85em; color: #ccc; min-width: 150px; }
-
-  .bar-bg {
-    flex: 1;
-    height: 4px;
-    background: #1e1e1e;
-    border-radius: 2px;
-    overflow: hidden;
-  }
-
-  .bar-fill {
-    height: 100%;
-    background: #e8e8e8;
-    border-radius: 2px;
-    transition: width 0.5s ease;
-  }
-
-  .result-count { font-size: 0.8em; color: #555; min-width: 60px; text-align: right; }
-
-  .badge {
-    display: inline-block;
-    background: #111;
-    border: 1px solid #222;
-    color: #666;
-    font-size: 0.78em;
-    padding: 4px 12px;
-    border-radius: 20px;
-    margin-bottom: 20px;
-    letter-spacing: 0.05em;
-  }
-
-  .admin-btns {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-  }
-
-  .loading-msg { color: #444; font-size: 0.88em; padding: 20px 0; }
-
-  .success-wrap { text-align: center; padding: 3rem 0; }
-  .success-icon { font-size: 2.5em; margin-bottom: 16px; }
-  .success-wrap p { color: #666; font-size: 0.9em; line-height: 1.8; }
+  .success-wrap { text-align: center; padding: 40px 20px; background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-lg); }
+  .success-icon { font-size: 3rem; color: var(--success); margin-bottom: 20px; }
+  .success-wrap p { color: var(--text-sub); font-size: 0.95rem; margin-bottom: 30px; }
 
   .toast {
-    position: fixed;
-    bottom: 28px;
-    left: 50%;
-    transform: translateX(-50%) translateY(16px);
-    background: #e8e8e8;
-    color: #0a0a0a;
-    padding: 11px 26px;
-    border-radius: 4px;
-    font-size: 0.85em;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    opacity: 0;
-    transition: all 0.25s ease;
-    pointer-events: none;
-    z-index: 999;
-    white-space: nowrap;
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--text-main); color: var(--bg-color);
+    padding: 12px 24px; border-radius: 30px; font-size: 0.9rem; font-weight: 500;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    opacity: 0; transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    pointer-events: none; z-index: 1000; white-space: nowrap;
   }
-
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+  .spinner {
+    border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid #fff;
+    border-radius: 50%; width: 18px; height: 18px; animation: spin 1s linear infinite; display: none;
+  }
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
   @media (max-width: 480px) {
-    body { padding: 16px; }
-    .container { padding: 24px 0 60px; }
-    h1 { font-size: 1.1em; margin-bottom: 28px; }
-    .opt { padding: 10px 14px; font-size: 0.9em; }
+    .opt { flex: 1 1 100%; } /* スマホで1列に */
+    .container { padding: 30px 16px 60px; }
+    .result-row { flex-direction: column; align-items: flex-start; gap: 4px; }
+    .bar-bg { width: 100%; margin: 4px 0; }
+    .result-count { align-self: flex-end; }
   }
 </style>
 </head>
 <body>
 
-<div class="container">
+<div class="progress-container" id="progress-container">
+  <div class="progress-bar" id="progress-bar"></div>
+</div>
 
+<div class="container">
   <!-- アンケート画面 -->
   <div id="sv-survey" class="section active">
     <h1>教員アンケート</h1>
 
-    <div class="q-block">
+    <div class="q-block" id="block-grade">
       <div class="q-label">担当学年</div>
       <div class="opts" data-key="grade">
         <button class="opt" data-value="1年">1年</button>
@@ -311,7 +270,7 @@
       </div>
     </div>
 
-    <div class="q-block">
+    <div class="q-block" id="block-role">
       <div class="q-label">役職</div>
       <div class="opts" data-key="role">
         <button class="opt" data-value="一般">一般</button>
@@ -320,10 +279,8 @@
       </div>
     </div>
 
-    <div class="divider"></div>
-
-    <div class="q-block">
-      <div class="q-label">授業中に雑談をするかどうか（理科）</div>
+    <div class="q-block" id="block-q1">
+      <div class="q-label">授業中に雑談をするかどうか <span>(理科)</span></div>
       <div class="opts" data-key="q1">
         <button class="opt" data-value="はい">はい</button>
         <button class="opt" data-value="いいえ">いいえ</button>
@@ -331,16 +288,16 @@
       </div>
     </div>
 
-    <div class="q-block">
-      <div class="q-label">授業でほぼ毎回生徒を当てる（数学）</div>
+    <div class="q-block" id="block-q2">
+      <div class="q-label">授業でほぼ毎回生徒を当てる <span>(数学)</span></div>
       <div class="opts" data-key="q2">
         <button class="opt" data-value="はい">はい</button>
         <button class="opt" data-value="いいえ">いいえ</button>
       </div>
     </div>
 
-    <div class="q-block">
-      <div class="q-label">結婚しているかどうか（全員）</div>
+    <div class="q-block" id="block-q3">
+      <div class="q-label">結婚しているかどうか <span>(全員)</span></div>
       <div class="opts" data-key="q3">
         <button class="opt" data-value="結婚している">結婚している</button>
         <button class="opt" data-value="恋人がいる">恋人がいる</button>
@@ -349,8 +306,8 @@
       </div>
     </div>
 
-    <div class="q-block">
-      <div class="q-label">怒ったふりをしたことがあるか（学年主任・副主任）</div>
+    <div class="q-block" id="block-q4">
+      <div class="q-label">怒ったふりをしたことがあるか <span>(学年主任・副主任)</span></div>
       <div class="opts" data-key="q4">
         <button class="opt" data-value="はい">はい</button>
         <button class="opt" data-value="いいえ">いいえ</button>
@@ -358,19 +315,21 @@
       </div>
     </div>
 
-    <div class="q-block">
-      <div class="q-label">正直課題を出すのがめんどくさいと思ったことがあるか（英語）</div>
+    <div class="q-block" id="block-q5">
+      <div class="q-label">正直課題を出すのがめんどくさいと思ったことがあるか <span>(英語)</span></div>
       <div class="opts" data-key="q5">
         <button class="opt" data-value="はい">はい</button>
         <button class="opt" data-value="いいえ">いいえ</button>
       </div>
     </div>
 
-    <div id="sv-err" class="err-msg">すべての質問に回答してください。</div>
-    <button class="submit-btn" id="submit-btn" onclick="submitSurvey()">送信する</button>
+    <button class="submit-btn" id="submit-btn" onclick="submitSurvey()">
+      <div class="spinner" id="submit-spinner"></div>
+      <span id="submit-text">回答を送信する</span>
+    </button>
 
     <div class="admin-link">
-      <a onclick="showSection('sv-login')">管理者モード →</a>
+      <a onclick="showSection('sv-login')">管理者モードへ</a>
     </div>
   </div>
 
@@ -378,44 +337,41 @@
   <div id="sv-done" class="section">
     <div class="success-wrap">
       <div class="success-icon">✓</div>
-      <h1 style="border:none; text-align:center; margin-bottom:16px;">送信完了</h1>
+      <h2 style="margin-bottom:16px;">送信完了</h2>
       <p>ご回答ありがとうございました。<br>再度送信すると回答が上書きされます。</p>
-      <div class="btn-row" style="justify-content:center; margin-top:2rem;">
-        <button class="btn-sub" onclick="showSection('sv-survey')">回答を修正する</button>
-      </div>
+      <button class="btn-sub" onclick="showSection('sv-survey')">回答を修正する</button>
     </div>
   </div>
 
   <!-- ログイン画面 -->
   <div id="sv-login" class="section">
-    <h2>管理者ログイン</h2>
-    <input type="password" class="pw-input" id="sv-pw" placeholder="パスワードを入力"
-      onkeydown="if(event.key==='Enter')doLogin()">
-    <div id="pw-err" class="err-msg" style="margin-bottom:10px;">パスワードが違います。</div>
-    <div class="btn-row">
-      <button class="submit-btn" style="margin-top:0;" onclick="doLogin()">ログイン</button>
-      <button class="btn-sub" onclick="showSection('sv-survey')">戻る</button>
+    <div class="q-block">
+      <h2>管理者ログイン</h2>
+      <input type="password" class="pw-input" id="sv-pw" placeholder="パスワードを入力" onkeydown="if(event.key==='Enter')doLogin()">
+      <div class="admin-btns" style="margin-bottom: 0;">
+        <button class="submit-btn" style="margin-top:0; flex: 1;" onclick="doLogin()">ログイン</button>
+        <button class="btn-sub" style="margin-top:0;" onclick="showSection('sv-survey')">戻る</button>
+      </div>
     </div>
   </div>
 
   <!-- 管理者画面 -->
   <div id="sv-admin" class="section">
-    <h2>管理者モード — 回答一覧</h2>
+    <h2>管理者ダッシュボード</h2>
     <div class="admin-btns">
       <button class="btn-sub" onclick="showSection('sv-survey')">← 戻る</button>
       <button class="btn-sub" onclick="loadAdmin()">🔄 更新</button>
-      <button class="btn-sub" onclick="calcResults()">📊 集計する</button>
-      <button class="btn-danger" onclick="clearAll()">🗑 全削除</button>
+      <button class="btn-sub" onclick="calcResults()">📊 集計</button>
+      <button class="btn-danger" style="margin-left: auto;" onclick="clearAll()">🗑 全削除</button>
     </div>
     <div id="admin-content"><div class="loading-msg">読み込み中...</div></div>
     <div id="result-area" class="result-wrap"></div>
   </div>
-
 </div>
 
 <div class="toast" id="toast"></div>
 
-<!-- Firebase SDK (Firestore用へ移行) -->
+<!-- Firebase SDK -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
   import { getFirestore, doc, setDoc, getDoc, getDocs, collection, writeBatch } 
@@ -428,13 +384,11 @@
     storageBucket: "question-2506a.firebasestorage.app",
     messagingSenderId: "937214412547",
     appId: "1:937214412547:web:8ceb379d3e938106420b36"
-    // ※ databaseURL は不要になったため削除
   };
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  // 端末ごとのIDを生成（localStorageで管理）
   function getUid() {
     let id = localStorage.getItem('sv_uid');
     if (!id) {
@@ -444,43 +398,61 @@
     return id;
   }
 
-  // グローバルに公開（onclick から呼べるように）
   window._firebase = { db, doc, setDoc, getDoc, getDocs, collection, writeBatch, getUid };
 
-  // 回答送信
+  // データ送信
   window.submitSurvey = async function() {
     const required = ['grade','role','q1','q2','q3','q4','q5'];
-    const missing = required.filter(k => !window._ans[k]);
-    const errEl = document.getElementById('sv-err');
-    if (missing.length > 0) { errEl.style.display = 'block'; return; }
-    errEl.style.display = 'none';
+    let firstError = null;
+    
+    // エラーハイライトのリセットとチェック
+    document.querySelectorAll('.q-block').forEach(b => b.classList.remove('error-highlight'));
+    
+    for (const k of required) {
+      if (!window._ans[k]) {
+        const block = document.getElementById(`block-${k}`);
+        block.classList.add('error-highlight');
+        if (!firstError) firstError = block;
+      }
+    }
+
+    // 未回答がある場合、最初のエラー箇所へスクロール
+    if (firstError) {
+      showToast('未回答の項目があります');
+      firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
 
     const btn = document.getElementById('submit-btn');
+    const spinner = document.getElementById('submit-spinner');
+    const text = document.getElementById('submit-text');
+    
     btn.disabled = true;
-    btn.textContent = '送信中...';
+    spinner.style.display = 'block';
+    text.textContent = '送信中...';
 
     try {
       const uid = getUid();
       const { db, doc, setDoc } = window._firebase;
       
-      // Firestoreの「answers」コレクション内の「uid」ドキュメントに保存
       await setDoc(doc(db, 'answers', uid), {
         ...window._ans,
         timestamp: Date.now()
       });
       
       showSection('sv-done');
-      showToast('送信しました！');
+      showToast('回答を送信しました！');
     } catch(e) {
-      showToast('送信失敗。通信環境を確認してください。');
+      showToast('通信エラーが発生しました');
       console.error(e);
     } finally {
       btn.disabled = false;
-      btn.textContent = '送信する';
+      spinner.style.display = 'none';
+      text.textContent = '回答を送信する';
     }
   };
 
-  // 管理者データ読み込み
+  // 管理者データのロード
   window.loadAdmin = async function() {
     const contentEl = document.getElementById('admin-content');
     contentEl.innerHTML = '<div class="loading-msg">読み込み中...</div>';
@@ -488,9 +460,8 @@
 
     try {
       const { db, collection, getDocs } = window._firebase;
-      
-      // answersコレクションから全ドキュメントを取得
       const snap = await getDocs(collection(db, 'answers'));
+      
       if (snap.empty) {
         contentEl.innerHTML = '<div class="loading-msg">まだ回答がありません。</div>';
         window._adminData = [];
@@ -498,32 +469,29 @@
       }
 
       const entries = [];
-      snap.forEach(doc => {
-        entries.push(doc.data());
-      });
+      snap.forEach(doc => entries.push(doc.data()));
       window._adminData = entries;
 
       const qs = ['grade','role','q1','q2','q3','q4','q5'];
-      const ths = ['学年','役職','Q1理科','Q2数学','Q3結婚','Q4怒ったふり','Q5英語'];
+      const ths = ['学年','役職','Q1(理科)','Q2(数学)','Q3(結婚)','Q4(怒ふり)','Q5(英語)'];
 
       let html = `<span class="badge">総回答数：${entries.length} 名</span>
-        <div class="tbl-wrap"><table><thead><tr><th>回答者</th>`;
+        <div class="tbl-wrap"><table><thead><tr><th>回答者ID</th>`;
       ths.forEach(t => html += `<th>${t}</th>`);
       html += '</tr></thead><tbody>';
       entries.forEach((d, i) => {
-        html += `<tr><td>回答者${i+1}</td>`;
+        html += `<tr><td>回答者 ${i+1}</td>`;
         qs.forEach(k => html += `<td>${esc(d[k]||'')}</td>`);
         html += '</tr>';
       });
       html += '</tbody></table></div>';
       contentEl.innerHTML = html;
     } catch(e) {
-      contentEl.innerHTML = '<div class="loading-msg" style="color:#e74c3c;">データの取得に失敗しました。</div>';
-      console.error(e);
+      contentEl.innerHTML = '<div class="loading-msg" style="color:var(--error);">データの取得に失敗しました。</div>';
     }
   };
 
-  // 集計
+  // 集計処理
   window.calcResults = function() {
     const entries = window._adminData || [];
     const area = document.getElementById('result-area');
@@ -532,15 +500,14 @@
     const qs = [
       { key:'grade', label:'担当学年' },
       { key:'role',  label:'役職' },
-      { key:'q1',   label:'授業中に雑談をするかどうか（理科）' },
-      { key:'q2',   label:'授業でほぼ毎回生徒を当てる（数学）' },
-      { key:'q3',   label:'結婚しているかどうか（全員）' },
-      { key:'q4',   label:'怒ったふりをしたことがあるか（学年主任・副主任）' },
-      { key:'q5',   label:'正直課題を出すのがめんどくさいと思ったことがあるか（英語）' },
+      { key:'q1',   label:'授業中に雑談をするかどうか (理科)' },
+      { key:'q2',   label:'授業でほぼ毎回生徒を当てる (数学)' },
+      { key:'q3',   label:'結婚しているかどうか (全員)' },
+      { key:'q4',   label:'怒ったふりをしたことがあるか (学年主任・副主任)' },
+      { key:'q5',   label:'正直課題を出すのがめんどくさいか (英語)' },
     ];
 
-    let html = '<div style="height:1px;background:#1a1a1a;margin-bottom:24px;"></div>';
-    html += `<span class="badge">集計結果 — 総回答数 ${entries.length} 名</span>`;
+    let html = `<span class="badge" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">集計結果 (${entries.length} 名)</span>`;
 
     qs.forEach(q => {
       const counts = {};
@@ -559,7 +526,6 @@
       });
       html += '</div>';
     });
-
     area.innerHTML = html;
   };
 
@@ -568,27 +534,22 @@
     if (!confirm('全データを削除しますか？この操作は取り消せません。')) return;
     try {
       const { db, collection, getDocs, writeBatch } = window._firebase;
-      
-      // Firestoreはコレクションの一発削除が無いため、一括処理（Batch）でドキュメントを全て削除
       const snap = await getDocs(collection(db, 'answers'));
       if (snap.empty) return;
 
       const batch = writeBatch(db);
-      snap.forEach(doc => {
-        batch.delete(doc.ref);
-      });
+      snap.forEach(doc => batch.delete(doc.ref));
       await batch.commit();
 
       await window.loadAdmin();
       document.getElementById('result-area').innerHTML = '';
-      showToast('削除しました');
+      showToast('全データを削除しました');
     } catch(e) {
       showToast('削除に失敗しました');
-      console.error(e);
     }
   };
 
-  // 前回の回答を復元
+  // 過去の回答復元
   async function restorePrev() {
     const uid = getUid();
     try {
@@ -606,57 +567,79 @@
           }
         });
       });
+      updateProgress();
     } catch(e) {}
   }
-
   restorePrev();
 </script>
 
 <script>
-  // 回答状態管理
   window._ans = {};
   window._adminData = [];
+  const TOTAL_QUESTIONS = 7; // 質問の総数
 
-  // ボタン選択
+  // プログレスバー更新
+  function updateProgress() {
+    const answered = Object.keys(window._ans).length;
+    const progress = (answered / TOTAL_QUESTIONS) * 100;
+    const bar = document.getElementById('progress-bar');
+    bar.style.width = `${progress}%`;
+    
+    const container = document.getElementById('progress-container');
+    if (answered > 0 && progress < 100) {
+      container.style.display = 'block';
+    } else if (progress === 100) {
+      setTimeout(() => container.style.display = 'none', 500); // 完了したら隠す
+    }
+  }
+
+  // 選択肢のクリックイベント
   document.querySelectorAll('.opts').forEach(g => {
     g.querySelectorAll('.opt').forEach(b => {
       b.addEventListener('click', () => {
         g.querySelectorAll('.opt').forEach(x => x.classList.remove('sel'));
         b.classList.add('sel');
         window._ans[g.dataset.key] = b.dataset.value;
+        
+        // エラーハイライトの解除
+        g.closest('.q-block').classList.remove('error-highlight');
+        
+        updateProgress();
       });
     });
   });
 
-  // 画面切り替え
+  // 画面遷移
   window.showSection = function(id) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
+    
+    // プログレスバーの表示制御
+    document.getElementById('progress-container').style.display = (id === 'sv-survey' && Object.keys(window._ans).length > 0) ? 'block' : 'none';
   };
 
   // ログイン
   window.doLogin = function() {
     const pw = document.getElementById('sv-pw').value;
-    const errEl = document.getElementById('pw-err');
     if (pw === 'Sample1') {
-      errEl.style.display = 'none';
       document.getElementById('sv-pw').value = '';
       showSection('sv-admin');
       window.loadAdmin();
     } else {
-      errEl.style.display = 'block';
+      showToast('パスワードが違います');
     }
   };
 
-  // トースト
+  // トースト通知
+  let toastTimer;
   window.showToast = function(msg) {
     const t = document.getElementById('toast');
     t.textContent = msg;
     t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2500);
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
   };
 
-  // エスケープ
   window.esc = function(s) {
     return String(s||'').replace(/[&<>'"]/g, c =>
       ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
